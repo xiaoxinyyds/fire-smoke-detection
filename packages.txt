@@ -1,5 +1,6 @@
-# System dependencies for OpenCV headless
-libgl1-mesa-glx
+# System dependencies for OpenCV headless on Debian Trixie
+# Minimal X11 libraries for headless environments
+libgl1
 libglib2.0-0
 libsm6
 libxext6

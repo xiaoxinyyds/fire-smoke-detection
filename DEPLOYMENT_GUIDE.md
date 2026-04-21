@@ -39,7 +39,7 @@
 已创建两个依赖文件：
 - `requirements.txt`：基础依赖
 - `requirements_deploy.txt`：部署推荐依赖（更完整，使用ultralytics-opencv-headless避免GUI依赖）
-- `packages.txt`：系统依赖（用于安装libGL等系统库，解决OpenCV导入错误）
+- `packages.txt`：系统依赖（备选方案，用于安装libGL等系统库，如果`ultralytics-opencv-headless`仍需要）
 
 ### 3. 配置文件
 已创建 `.streamlit/config.toml`，包含：
@@ -53,7 +53,7 @@
 ├── app.py                          # 主应用文件
 ├── requirements.txt               # 基础依赖文件
 ├── requirements_deploy.txt        # 部署专用依赖（推荐使用）
-├── packages.txt                   # 系统依赖（用于解决libGL错误）
+├── packages.txt                   # 系统依赖（备选，用于解决libGL错误，如不需要可删除）
 ├── .streamlit/config.toml         # Streamlit配置
 ├── runtime.txt                    # Python版本指定
 ├── runs/detect/fire_smoke_optimized1/
@@ -96,7 +96,7 @@ git push -u origin main
 将以下文件上传到仓库：
 - `app.py`
 - `requirements.txt`（或`requirements_deploy.txt`，**推荐使用`requirements_deploy.txt`并重命名为`requirements.txt`**）
-- `packages.txt`（系统依赖，解决libGL错误）
+- `packages.txt`（系统依赖，解决libGL错误，如不需要可删除）
 - `.streamlit/` 文件夹
 - `runtime.txt`
 - `runs/` 文件夹（包含模型文件）
@@ -116,6 +116,10 @@ git push -u origin main
 
 ### 步骤4：等待部署完成
 - Streamlit会自动安装依赖并启动应用
+- **注意**：如果遇到系统依赖安装错误（如`libgl1-mesa-glx`不可用）：
+  1. 检查`packages.txt`文件中的包名是否适用于当前系统（Debian Trixie）
+  2. 如果错误持续，可以删除`packages.txt`文件，仅依赖`ultralytics-opencv-headless`包
+  3. 重新推送代码并重新部署
 - 部署时间：首次部署约3-5分钟
 - 部署成功后，会获得一个URL：`https://你的应用名.streamlit.app`
 
@@ -185,10 +189,10 @@ ssh -R 80:localhost:8501 ssh.localhost.run
      - 确保使用 `requirements_deploy.txt`（已配置为使用`ultralytics-opencv-headless`）
      - 或者修改 `requirements.txt` 将 `ultralytics>=8.2.0` 替换为 `ultralytics-opencv-headless>=8.2.0`
    
-   - **方法二**：使用系统依赖补丁
-     - 在仓库根目录创建 `packages.txt` 文件，添加以下内容：
+   - **方法二**：使用系统依赖补丁（备选方案）
+     - 在仓库根目录创建 `packages.txt` 文件，添加以下内容（适用于Debian Trixie）：
        ```
-       libgl1-mesa-glx
+       libgl1
        libglib2.0-0
        libsm6
        libxext6
@@ -198,7 +202,8 @@ ssh -R 80:localhost:8501 ssh.localhost.run
        libfontconfig1
        libfreetype6
        ```
-     - 确保使用 `requirements_deploy.txt`（包含`opencv-python-headless`无GUI版本）
+     - **注意**：如果`libgl1`包不可用，可以尝试删除`packages.txt`文件，仅使用方法一
+     - 确保使用 `requirements_deploy.txt`（包含`ultralytics-opencv-headless`无GUI版本）
    
    - 重新部署应用，Streamlit Cloud会自动安装系统依赖
 
@@ -265,7 +270,7 @@ ssh -R 80:localhost:8501 ssh.localhost.run
 
 **部署成功的关键**：
 1. ✅ 正确的文件结构
-2. ✅ 完整的依赖列表（包括系统依赖packages.txt）
+2. ✅ 完整的依赖列表（包括Python依赖和可选的系统依赖）
 3. ✅ 模型文件包含在仓库中
 4. ✅ 使用相对路径
 5. ✅ 考虑CPU环境优化

@@ -1,5 +1,17 @@
+# streamlit>=1.32.0
+# ultralytics>=8.2.0
+# opencv-python>=4.8.0
+# pillow>=10.0.0
+# torch>=2.0.0
+
+# Streamlit部署专用依赖文件
 streamlit>=1.32.0
 ultralytics>=8.2.0
-opencv-python>=4.8.0
+opencv-python-headless>=4.8.0  # 无GUI版本，适合服务器环境
 pillow>=10.0.0
 torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+pandas>=2.0.0  # 用于CSV文件读取
+# 可选：如果需要使用GPU，保持torch版本与CUDA兼容
+# 注意：Streamlit Cloud通常只提供CPU环境

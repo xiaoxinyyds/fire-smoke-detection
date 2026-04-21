@@ -164,8 +164,7 @@ wandb/
 # Neural Network weights -----------------------------------------------------------------------------------------------
 weights/
 *.weights
-# *.pt - 注释掉，我们需要提交训练好的模型
-# !runs/detect/fire_smoke_optimized1/weights/*.pt - 已在前面添加
+*.pt  # 忽略所有.pt文件，但我们的模型文件例外已在前面定义
 *.ts
 *.pb
 *.onnx

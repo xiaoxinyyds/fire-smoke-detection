@@ -33,11 +33,13 @@
 - 所有路径使用相对路径 ✅ 已完成
 - 有文件存在检查 ✅ 已完成
 - 支持纯CPU环境 ✅ 已完成
+- 使用ultralytics-opencv-headless避免GUI依赖 ✅ 已完成
 
 ### 2. 依赖管理
 已创建两个依赖文件：
 - `requirements.txt`：基础依赖
-- `requirements_deploy.txt`：部署推荐依赖（更完整）
+- `requirements_deploy.txt`：部署推荐依赖（更完整，使用ultralytics-opencv-headless避免GUI依赖）
+- `packages.txt`：系统依赖（用于安装libGL等系统库，解决OpenCV导入错误）
 
 ### 3. 配置文件
 已创建 `.streamlit/config.toml`，包含：
@@ -49,7 +51,9 @@
 确保以下文件存在于仓库中：
 ```
 ├── app.py                          # 主应用文件
-├── requirements.txt               # 依赖文件
+├── requirements.txt               # 基础依赖文件
+├── requirements_deploy.txt        # 部署专用依赖（推荐使用）
+├── packages.txt                   # 系统依赖（用于解决libGL错误）
 ├── .streamlit/config.toml         # Streamlit配置
 ├── runtime.txt                    # Python版本指定
 ├── runs/detect/fire_smoke_optimized1/
@@ -91,7 +95,8 @@ git push -u origin main
 #### 方法B：使用GitHub Desktop 或网页上传
 将以下文件上传到仓库：
 - `app.py`
-- `requirements.txt`（或`requirements_deploy.txt`）
+- `requirements.txt`（或`requirements_deploy.txt`，**推荐使用`requirements_deploy.txt`并重命名为`requirements.txt`**）
+- `packages.txt`（系统依赖，解决libGL错误）
 - `.streamlit/` 文件夹
 - `runtime.txt`
 - `runs/` 文件夹（包含模型文件）
@@ -106,6 +111,7 @@ git push -u origin main
    - **Branch**: `main`
    - **Main file path**: `app.py`
    - **Python version**: 3.9（自动从runtime.txt读取）
+   - **依赖文件**: Streamlit Cloud会自动使用仓库根目录的 `requirements.txt` 文件。确保该文件使用 `ultralytics-opencv-headless`（或确保 `requirements_deploy.txt` 已重命名为 `requirements.txt`）
 5. 点击 "Deploy!"
 
 ### 步骤4：等待部署完成
@@ -169,7 +175,34 @@ ssh -R 80:localhost:8501 ssh.localhost.run
    - 使用 `requirements_deploy.txt` 替代 `requirements.txt`
    - 移除版本号限制：`torch>=2.0.0` → `torch`
 
-3. **内存不足**
+3. **libGL.so.1 缺失错误**
+   ```
+   错误：ImportError: libGL.so.1: cannot open shared object file: No such file or directory
+   ```
+   **原因**：OpenCV需要系统图形库，但Streamlit Cloud服务器缺少相关依赖。
+   **解决方案**：
+   - **方法一（推荐）**：使用 `ultralytics-opencv-headless` 包替代 `ultralytics`
+     - 确保使用 `requirements_deploy.txt`（已配置为使用`ultralytics-opencv-headless`）
+     - 或者修改 `requirements.txt` 将 `ultralytics>=8.2.0` 替换为 `ultralytics-opencv-headless>=8.2.0`
+   
+   - **方法二**：使用系统依赖补丁
+     - 在仓库根目录创建 `packages.txt` 文件，添加以下内容：
+       ```
+       libgl1-mesa-glx
+       libglib2.0-0
+       libsm6
+       libxext6
+       libxrender1
+       libxfixes3
+       libxi6
+       libfontconfig1
+       libfreetype6
+       ```
+     - 确保使用 `requirements_deploy.txt`（包含`opencv-python-headless`无GUI版本）
+   
+   - 重新部署应用，Streamlit Cloud会自动安装系统依赖
+
+4. **内存不足**
    ```
    错误：Killed - 应用崩溃
    ```
@@ -178,7 +211,7 @@ ssh -R 80:localhost:8501 ssh.localhost.run
    - 优化模型：使用更小的YOLOv8n模型
    - 减少并发用户数
 
-4. **摄像头不可用**
+5. **摄像头不可用**
    - Streamlit Cloud无法访问本地摄像头
    - 解决方案：仅使用图片上传功能，或提示用户使用本地部署
 
@@ -232,10 +265,11 @@ ssh -R 80:localhost:8501 ssh.localhost.run
 
 **部署成功的关键**：
 1. ✅ 正确的文件结构
-2. ✅ 完整的依赖列表
+2. ✅ 完整的依赖列表（包括系统依赖packages.txt）
 3. ✅ 模型文件包含在仓库中
 4. ✅ 使用相对路径
 5. ✅ 考虑CPU环境优化
+6. ✅ 使用ultralytics-opencv-headless避免GUI依赖
 
 如有问题，请参考：
 - [Streamlit文档](https://docs.streamlit.io/)

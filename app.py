@@ -405,6 +405,6 @@ else:  # 摄像头实时检测
 st.divider()
 st.markdown("""
 <div style="text-align: center; color: gray;">
-    <p>火灾烟雾检测系统 &copy; 2024 | 基于 Ultralytics YOLOv8 训练</p>
+    <p>火灾检测功能 &copy; 2024 | 基于 Ultralytics YOLOv8 训练</p>
 </div>
 """, unsafe_allow_html=True)

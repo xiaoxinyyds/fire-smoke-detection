@@ -1,6 +1,6 @@
 # Streamlit部署专用依赖文件 - 使用ultralytics-opencv-headless避免GUI依赖
 streamlit>=1.32.0
-ultralytics-opencv-headless>=8.2.0  # 无GUI版本，适合服务器环境（必须使用headless版本）
+ultralytics-opencv-headless>=8.4.47  # 无GUI版本，适合服务器环境（必须使用headless版本）
 pillow>=10.0.0
 torch>=2.0.0
 torchvision>=0.15.0
